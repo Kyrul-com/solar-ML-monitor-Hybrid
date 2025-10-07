@@ -1,1 +1,0 @@
-Solar ML monitoring UI
