@@ -6,268 +6,357 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hybrid GRU–LSTM Showcase</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Hybrid GRU–LSTM Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* CSS Reset and Core Styles */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f0f2f6; /* Lighter background for a cleaner look */
-            color: #1c1f23; /* Darker text for contrast */
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        /* --- CORE VARIABLES (BLUE THEME) --- */
+        :root {
+            --color-bg-primary: #0D1117; /* Deepest background */
+            --color-sidebar-bg: #161B22; /* Slightly lighter sidebar */
+            --color-text-main: #EFEFF4; 
+            --color-text-secondary: #A0A0B0;
+            --color-accent: #3b82f6; /* Vibrant Blue Accent */
+            --color-accent-dark: #2563eb;
+            --color-border: #30363D;
+            --color-card-bg-light: #1E232B; /* Lighter background for elements inside cards */
+            --color-card-bg: #161B22;
         }
 
-        /* Card/Container Style (The Main App Area) */
-        .card {
-            background-color: #ffffff; /* White card background */
-            padding: 2.5rem; /* Increased padding */
-            border-radius: 0.75rem; /* Slightly softer corners */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Lighter, more subtle shadow */
-            width: 500px; /* Slightly wider card */
-            max-width: 90%;
-            text-align: center;
-            transition: all 0.4s ease;
-            border: 1px solid #e0e0e0; /* Subtle border for definition */
+        /* --- GLOBAL LAYOUT & TYPOGRAPHY --- */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--color-bg-primary);
+            color: var(--color-text-main);
+            margin: 0;
+            display: flex; 
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-accent);
+            letter-spacing: 0.5px;
+            margin-bottom: 0;
         }
 
         h2 {
-            font-weight: 700;
-            color: #1c1f23;
-            margin-top: 0;
-            margin-bottom: 1.5rem;
-        }
-
-        /* Button and Input Styling (Primary/Accent Color: A Streamlit-like Blue/Green) */
-        button,
-        input[type="file"] {
-            background-color: #2b8cff; /* Streamlit-like primary blue */
-            border: none;
-            color: white;
-            padding: 0.75rem 1.75rem;
-            margin-top: 1rem;
-            border-radius: 0.375rem; /* Streamlit-like button curvature */
-            cursor: pointer;
-            font-size: 1rem;
             font-weight: 600;
-            transition: background-color 0.2s, box-shadow 0.2s;
+            color: var(--color-text-main);
+            margin-top: 0;
+            margin-bottom: 2rem;
+            font-size: 1.6rem;
+            border-bottom: 1px solid var(--color-border);
+            padding-bottom: 0.5rem;
+            text-align: left;
+        }
+
+        .hidden { display: none; }
+        
+        /* --- SIDEBAR NAVIGATION (FIXED) --- */
+        .sidebar {
+            width: 250px;
+            background-color: var(--color-sidebar-bg);
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--color-border);
+        }
+
+        .tab-buttons {
+            display: flex;
+            flex-direction: column;
+            margin-top: 2.5rem;
+            flex-grow: 1;
+        }
+
+        .tab-buttons button {
+            all: unset; /* Use all:unset for clean reset before custom styling */
+            color: var(--color-text-secondary);
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 0.5rem;
+            text-align: left;
+            font-size: 1rem;
+            font-weight: 400;
+            transition: background-color 0.2s, color 0.2s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        .tab-buttons button:hover {
+            background-color: var(--color-card-bg-light);
+            color: var(--color-text-main);
+        }
+
+        .tab-buttons button.active {
+            background-color: var(--color-accent);
+            color: var(--color-bg-primary); /* Dark text on bright accent */
+            font-weight: 600;
+        }
+        .tab-buttons button span {
+            margin-right: 10px;
+            font-weight: 700;
+        }
+
+        /* --- MAIN CONTENT AREA --- */
+        .content-area {
+            flex-grow: 1;
+            padding: 3rem 4rem;
+            overflow-y: auto; 
+        }
+
+        .card { 
+            background-color: var(--color-card-bg);
+            padding: 2.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            margin-bottom: 2rem;
+            border: 1px solid var(--color-border);
+            text-align: left;
+        }
+
+        /* --- BUTTONS & INPUTS --- */
+        
+        /* Primary Action Button */
+        .action-button {
+            all: unset;
+            background-color: var(--color-accent); 
+            color: var(--color-bg-primary); 
+            padding: 0.75rem 2rem;
+            margin-top: 2rem;
+            border-radius: 0.5rem; 
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
+            transition: all 0.2s;
+            float: right;
+            cursor: pointer;
+            display: inline-block;
         }
-
-        button:hover {
-            background-color: #1e70e0; /* Darker on hover */
-            box-shadow: 0 2px 6px rgba(43, 140, 255, 0.4);
+        .action-button:hover {
+            background-color: var(--color-accent-dark); 
+            box-shadow: 0 6px 15px rgba(59, 130, 246, 0.6);
         }
-
+        
         /* File Input Styling */
         input[type="file"] {
             display: block;
-            margin: 1.5rem auto 0.5rem;
-            padding: 1rem;
-            background-color: #f7f9fb; /* Light background for the file drop area */
-            border: 2px dashed #a0a0a0;
-            color: #1c1f23;
-            width: 80%;
+            margin: 1rem 0 2rem 0;
+            background-color: var(--color-card-bg-light);
+            border: 2px dashed var(--color-accent); 
+            color: var(--color-text-secondary);
+            width: 100%;
             cursor: pointer;
-            text-align: left;
-            font-size: 0.95rem;
-            /* Hide the default button appearance */
-            background-color: #fff;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            border: 2px dashed #cfd3da;
-            color: #666;
             text-align: center;
-            line-height: 1.5;
+            padding: 2.5rem 1rem;
+            border-radius: 0.75rem;
+            font-size: 0.95rem;
+            box-shadow: inset 0 0 8px rgba(59, 130, 246, 0.1);
         }
-        /* Custom label for a better file upload aesthetic */
+        input[type="file"]::before {
+             content: 'Drag & Drop CSV or Click to Select File';
+             color: var(--color-text-secondary);
+        }
         input[type="file"]::-webkit-file-upload-button {
             visibility: hidden;
             width: 0;
         }
-        input[type="file"]::before {
-            content: 'Select or Drag & Drop CSV file';
-            display: inline-block;
-            background: #fff;
-            border: 1px solid #ccc;
-            border-radius: 0.25rem;
-            padding: 0.5rem 1rem;
-            outline: none;
-            white-space: nowrap;
-            cursor: pointer;
-            font-weight: 600;
-            color: #2b8cff;
-        }
-        input[type="file"]:hover::before {
-            border-color: #2b8cff;
-        }
-
-
-        .hidden {
-            display: none;
-        }
-
-        /* Tab Buttons (Navigation) */
-        .tab-buttons {
+        
+        /* Step 2: Model Selection Buttons */
+        .model-select-group {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid #e0e0e0; /* Streamlined separator */
-            padding-bottom: 0.5rem;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
-
-        .tab-buttons button {
+        .model-select-group button {
+            all: unset;
             flex: 1;
-            background-color: transparent; /* Transparent button for steps */
-            color: #6c757d; /* Lighter color for inactive steps */
-            margin: 0 0.25rem;
-            padding: 0.5rem 0.25rem;
-            border-bottom: 3px solid transparent; /* Highlight indicator */
-            border-radius: 0; /* Remove button radius */
+            background-color: var(--color-card-bg-light);
+            color: var(--color-text-main);
+            border: 1px solid var(--color-border);
+            padding: 1rem;
+            border-radius: 0.5rem;
             font-weight: 600;
-            font-size: 0.9rem;
-            text-transform: none;
-            letter-spacing: normal;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            text-align: center;
+            cursor: pointer;
         }
-
-        .tab-buttons button:hover {
-            background-color: transparent;
-            color: #1c1f23;
-            box-shadow: none;
-        }
-
-        .tab-buttons button.active {
-            background-color: transparent;
-            color: #2b8cff; /* Active step color */
-            border-bottom: 3px solid #2b8cff; /* Solid underline for active tab */
+        .model-select-group button:hover {
+            background-color: #282d36;
+            border-color: var(--color-accent);
         }
         
-        /* Model Selection Buttons */
-        #tab1 button {
-            background-color: #f0f2f6; /* Neutral background for selection */
-            color: #1c1f23;
-            border: 1px solid #cfd3da;
-            transition: border-color 0.2s, background-color 0.2s;
-            padding: 0.7rem 2rem;
-            margin: 0 0.5rem;
-            text-transform: none;
-            letter-spacing: normal;
-        }
-        #tab1 button:hover {
-            background-color: #e8ebf0;
-            border-color: #2b8cff;
-            box-shadow: none;
+        .model-select-group button.selected {
+            background-color: var(--color-accent);
+            color: var(--color-bg-primary);
+            border-color: var(--color-accent);
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.5);
         }
         
         #modelChoice {
             font-size: 1rem;
-            font-weight: 600;
-            color: #2b8cff;
-            margin-top: 1rem;
-            opacity: 1;
-        }
-        
-        /* Table Styling */
-        table {
-            width: 100%;
-            border-collapse: separate; /* Use separate for rounded corners */
-            border-spacing: 0;
-            margin-top: 1.5rem;
-            border-radius: 0.5rem;
-            overflow: hidden; /* Ensures rounded corners are visible */
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            font-weight: 400;
+            color: var(--color-accent);
+            margin-top: 0.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
         }
 
-        th,
-        td {
-            padding: 0.75rem;
+        /* --- Step 3: Table Styling --- */
+        table {
+            width: 100%;
+            border-collapse: separate; 
+            border-spacing: 0;
+            margin-top: 1rem;
+            border-radius: 0.5rem;
+            overflow: hidden; 
+        }
+
+        th, td {
+            padding: 1rem;
             text-align: left;
             font-size: 0.95rem;
+            border: none;
         }
         
         th {
-            background-color: #f7f9fb; /* Light header background */
-            color: #1c1f23;
+            background-color: var(--color-card-bg-light); 
+            color: var(--color-text-main);
             font-weight: 600;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid var(--color-border);
         }
         
         td {
-            background-color: #ffffff;
-            border-bottom: 1px solid #e9ecef;
+            background-color: var(--color-card-bg);
+            border-bottom: 1px solid var(--color-border);
+            color: var(--color-text-secondary);
         }
+        td:first-child { color: var(--color-text-main); }
+        tr:last-child td { border-bottom: none; }
         
-        tr:last-child td {
-            border-bottom: none; /* No border on the last row */
+        /* --- Step 4: Dashboard --- */
+        .kpi-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 2rem;
+            margin-bottom: 2rem;
         }
-
-        /* Dashboard specific styles */
-        #tab3 p {
-            margin: 0.75rem 0;
-            text-align: left;
-            padding-left: 1rem;
-            font-size: 1.1rem;
+        .kpi-card {
+            flex: 1;
+            background-color: var(--color-card-bg-light);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border-left: 5px solid var(--color-accent);
         }
-        #tab3 strong {
-            color: #2b8cff;
+        .kpi-card p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+        }
+        .kpi-card strong {
+            display: block;
+            font-size: 2rem;
             font-weight: 700;
-            font-size: 1.2rem;
+            color: var(--color-accent);
+            margin-top: 0.5rem;
         }
         
         canvas {
             margin-top: 2rem;
-            background: #ffffff;
+            background: var(--color-card-bg-light);
             border-radius: 0.5rem;
-            border: 1px solid #e0e0e0;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            border: 1px solid var(--color-border);
+            padding: 1rem;
         }
     </style>
 </head>
 <body>
 
-    <div class="card">
+    <div class="sidebar">
+        <h1>GRU–LSTM Hybrid</h1>
         <div class="tab-buttons">
-            <button class="tab-btn active" onclick="showTab(0)">1. Upload</button>
-            <button class="tab-btn" onclick="showTab(1)">2. Model</button>
-            <button class="tab-btn" onclick="showTab(2)">3. Transform</button>
-            <button class="tab-btn" onclick="showTab(3)">4. Dashboard</button>
+            <button class="tab-btn active" data-tab-index="0" onclick="showTab(0)"><span>1</span> Upload Source Data</button>
+            <button class="tab-btn" data-tab-index="1" onclick="showTab(1)"><span>2</span> Select Model Unit</button>
+            <button class="tab-btn" data-tab-index="2" onclick="showTab(2)"><span>3</span> Data Transformation</button>
+            <button class="tab-btn" data-tab-index="3" onclick="showTab(3)"><span>4</span> View Dashboard</button>
         </div>
+    </div>
+
+    <div class="content-area">
 
         <div class="tab" id="tab0">
-            <h2>Upload Your CSV Data</h2>
-            <input type="file" accept=".csv" />
-            <button onclick="showTab(1)">Next Step</button>
+            <h2>Source Data Upload</h2>
+            <div class="card">
+                <p style="color:var(--color-text-secondary);">
+                    Please upload a clean CSV file containing time-series data for training and prediction.
+                </p>
+                <input type="file" accept=".csv" />
+                <button class="action-button" onclick="showTab(1)">Next Step: Model Selection</button>
+                <div style="clear:both;"></div>
+            </div>
         </div>
 
         <div class="tab hidden" id="tab1">
-            <h2>Select Prediction Model</h2>
-            <button onclick="selectModel('GRU')">GRU</button>
-            <button onclick="selectModel('LSTM')">LSTM</button>
-            <p id="modelChoice" style="margin-top:1.5rem;">No model selected.</p>
-            <button onclick="showTab(2)">Process Data</button>
+            <h2>Select Recurrent Unit</h2>
+            <div class="card">
+                <p style="color:var(--color-text-secondary);">
+                    Choose the primary recurrent unit for the Hybrid GRU-LSTM architecture.
+                </p>
+                <div class="model-select-group">
+                    <button id="btnGRU" onclick="selectModel('GRU')">Gated Recurrent Unit (GRU)</button>
+                    <button id="btnLSTM" onclick="selectModel('LSTM')">Long Short-Term Memory (LSTM)</button>
+                </div>
+                <p id="modelChoice">No unit selected.</p>
+                <button class="action-button" onclick="showTab(2)">Next Step: Preprocessing</button>
+                <div style="clear:both;"></div>
+            </div>
         </div>
 
         <div class="tab hidden" id="tab2">
             <h2>Data Imputation Preview</h2>
-            <table>
-                <tr><th>Input Value</th><th>Imputed Value</th></tr>
-                <tr><td>NaN (Missing)</td><td>23.4</td></tr>
-                <tr><td>56.7</td><td>56.7</td></tr>
-                <tr><td>(Empty String)</td><td>45.1</td></tr>
-            </table>
-            <button onclick="showTab(3)">View Dashboard</button>
+            <div class="card">
+                <p style="color:var(--color-text-secondary); margin-bottom: 1.5rem;">
+                    The system detected missing values (NaN) and imputed them using a dynamic mean strategy.
+                </p>
+                <table>
+                    <tr><th>Original Input Value</th><th>Imputed/Fixed Value</th></tr>
+                    <tr><td>NaN (Missing)</td><td>23.4</td></tr>
+                    <tr><td>56.7</td><td>56.7</td></tr>
+                    <tr><td>(Empty String)</td><td>45.1</td></tr>
+                    <tr><td>...</td><td>...</td></tr>
+                </table>
+                <button class="action-button" onclick="showTab(3)">Launch Dashboard</button>
+                <div style="clear:both;"></div>
+            </div>
         </div>
 
         <div class="tab hidden" id="tab3">
-            <h2>Prediction Dashboard</h2>
-            <p>Current Solar Panel Reading: <strong>82.4%</strong></p>
-            <p>Predicted Peak Efficiency: <strong>91.2%</strong></p>
-            <canvas id="chart" width="400" height="200"></canvas>
-            <button onclick="showTab(0)">Restart Workflow</button>
+            <h2>System Performance Overview</h2>
+            <div class="kpi-group">
+                <div class="kpi-card">
+                    <p>Current Panel Reading</p>
+                    <strong>82.4%</strong>
+                </div>
+                <div class="kpi-card">
+                    <p>Predicted Peak Efficiency</p>
+                    <strong>91.2%</strong>
+                </div>
+                <div class="kpi-card" style="border-left-color: #FBBF24;"> 
+                    <p>Model Confidence (F1-Score)</p>
+                    <strong style="color: #FBBF24;">0.95</strong>
+                </div>
+            </div>
+            
+            <div class="card" style="padding: 1.5rem;">
+                <canvas id="chart" width="800" height="300"></canvas>
+            </div>
+            
+            <button class="action-button" onclick="showTab(0)" style="float:left;">Start New Analysis</button>
+            <div style="clear:both;"></div>
         </div>
     </div>
 
@@ -276,32 +365,39 @@
         const tabs = document.querySelectorAll('.tab');
         const buttons = document.querySelectorAll('.tab-btn');
         let currentModel = null;
+        const ACCENT_COLOR = '#3b82f6';
+        const BG_PRIMARY_COLOR = '#0D1117';
 
         // Function to control tab visibility
         function showTab(index) {
             tabs.forEach(t => t.classList.add('hidden'));
             tabs[index].classList.remove('hidden');
+            
             buttons.forEach(b => b.classList.remove('active'));
-            buttons[index].classList.add('active');
+            const newActiveButton = document.querySelector(`.tab-btn[data-tab-index="${index}"]`);
+            if (newActiveButton) {
+                 newActiveButton.classList.add('active');
+            }
             
             // Re-render chart when dashboard tab is shown
             if (index === 3) {
                  if (window.myChart) window.myChart.update();
             }
+            
+            document.querySelector('.content-area').scrollTop = 0;
         }
+        showTab(0); 
 
         // Function to select and display the model choice
         function selectModel(name) {
             currentModel = name;
-            document.getElementById('modelChoice').innerText = "Selected Model: " + name + " (Hybrid GRU-LSTM)";
-            // Add visual cue for selected button (optional)
-            document.querySelectorAll('#tab1 button').forEach(btn => {
-                btn.style.backgroundColor = '#f0f2f6';
-                btn.style.borderColor = '#cfd3da';
+            document.getElementById('modelChoice').innerText = `Selected Unit: ${name} (Integrated into Hybrid Architecture)`;
+            
+            // Visual feedback for selection
+            document.querySelectorAll('.model-select-group button').forEach(btn => {
+                btn.classList.remove('selected');
             });
-            event.target.style.backgroundColor = '#2b8cff';
-            event.target.style.borderColor = '#2b8cff';
-            event.target.style.color = 'white';
+            event.target.classList.add('selected');
         }
 
         // Dummy Chart Setup
@@ -313,48 +409,40 @@
                 datasets: [{
                     label: 'Solar Panel Output (W)',
                     data: [400, 420, 415, 440, 460, 430],
-                    borderColor: '#2b8cff', // Use the new primary color
-                    backgroundColor: 'rgba(43, 140, 255, 0.1)',
-                    borderWidth: 2,
-                    pointRadius: 4,
-                    pointBackgroundColor: '#2b8cff',
-                    tension: 0.4, // Smoother line
+                    borderColor: ACCENT_COLOR, 
+                    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                    borderWidth: 3,
+                    pointRadius: 5,
+                    pointBackgroundColor: ACCENT_COLOR,
+                    tension: 0.45, 
                     fill: true
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
                     legend: {
                         labels: {
-                            color: '#1c1f23', // Darker legend text
-                            font: { family: 'Inter', weight: '600' }
+                            color: 'var(--color-text-main)', 
+                            font: { family: 'Poppins', weight: '600' }
                         }
                     },
-                    title: {
-                        display: false,
-                    }
+                    title: { display: false }
                 },
                 scales: {
                     x: {
-                        ticks: { color: '#6c757d', font: { family: 'Inter' } },
-                        grid: { color: '#e0e0e0', drawOnChartArea: true, drawTicks: false }
+                        ticks: { color: 'var(--color-text-secondary)', font: { family: 'Poppins' } },
+                        grid: { color: 'rgba(48, 54, 61, 0.4)', drawOnChartArea: true, drawTicks: false }
                     },
                     y: {
-                        ticks: { color: '#6c757d', font: { family: 'Inter' } },
-                        grid: { color: '#e0e0e0', drawOnChartArea: true, drawTicks: false }
+                        ticks: { color: 'var(--color-text-secondary)', font: { family: 'Poppins' } },
+                        grid: { color: 'rgba(48, 54, 61, 0.4)', drawOnChartArea: true, drawTicks: false }
                     }
                 }
             }
         });
         window.myChart = chart;
-        
-        // Initial setup for the file input to show placeholder text
-        document.querySelector('input[type="file"]').addEventListener('change', function(e) {
-            const fileName = e.target.files[0] ? e.target.files[0].name : 'Select or Drag & Drop CSV file';
-            e.target.style.setProperty('--file-name', "'" + fileName + "'");
-            e.target.setAttribute('data-file-name', fileName);
-        });
     </script>
 
 </body>
