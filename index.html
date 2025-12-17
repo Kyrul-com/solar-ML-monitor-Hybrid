@@ -3,281 +3,592 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stellaris AI | Access Control</title>
-    <!-- Load Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <title>S.C.H.A.L.E | Solar Forecasting</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        /* --- CORE STYLES: KINETIC LAB --- */
         :root {
-            --color-bg-main: #ffffff;
-            --color-text-main: #000000;
-            --color-accent: #facc15;        /* Safety Yellow */
+            --ba-blue: #1289F4;
+            --ba-light-blue: #E2F4FF;
+            --ba-dark: #2D3A4F;
+            --ba-grey: #8E9AAF;
+            --ba-bg: #F3F5F9;
+            --ba-accent: #FFD700;
+            --glass: rgba(255, 255, 255, 0.95);
+            --sidebar-bg: white;
+            --content-bg: #F3F5F9;
+            --card-bg: white;
+            --text-primary: #2D3A4F;
+            --text-secondary: #8E9AAF;
+            --border-color: #EEE;
         }
-        
+
+        /* Dark Mode Colors */
+        [data-theme="dark"] {
+            --ba-bg: #1a1d29;
+            --sidebar-bg: #22252e;
+            --content-bg: #1a1d29;
+            --card-bg: #22252e;
+            --text-primary: #e4e6eb;
+            --text-secondary: #b0b3b8;
+            --border-color: #3a3d47;
+            --ba-light-blue: rgba(18, 137, 244, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Nunito', sans-serif;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--color-bg-main);
-            color: var(--color-text-main);
+            background-color: var(--content-bg);
+            color: var(--text-primary);
+            height: 100vh;
             overflow: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        .data-mono {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-            letter-spacing: -0.02em;
-        }
-
-        /* --- ANIMATIONS --- */
-        
-        @keyframes grid-pan {
-            0% { background-position: 0 0; }
-            100% { background-position: 40px 40px; }
-        }
-        .animate-grid-pan {
-            animation: grid-pan 4s linear infinite;
-        }
-
-        @keyframes slide-up-fade {
-            0% { opacity: 0; transform: translateY(20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-        .animate-enter {
-            animation: slide-up-fade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        @keyframes scan-line {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-        .scan-bar {
-            position: absolute;
-            top: 0;
-            height: 100%;
-            width: 50%;
-            background: linear-gradient(90deg, transparent, rgba(250, 204, 21, 0.4), transparent);
-            animation: scan-line 2s linear infinite;
-        }
-
-        /* --- COMPONENTS --- */
-
-        .system-frame {
-            background-color: white;
-            border: 1px solid #d1d5db;
-            position: relative;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-
-        /* Static Black Corners */
-        .corner-marks::before {
-            content: ''; position: absolute; top: -1px; left: -1px; width: 12px; height: 12px;
-            border-top: 3px solid black; border-left: 3px solid black; z-index: 20;
-        }
-        .corner-marks::after {
-            content: ''; position: absolute; bottom: -1px; right: -1px; width: 12px; height: 12px;
-            border-bottom: 3px solid black; border-right: 3px solid black; z-index: 20;
-        }
-
-        /* Input Styling */
-        .lab-input {
-            width: 100%;
-            background: #f9fafb;
-            border: 2px solid #e5e7eb;
-            padding: 12px;
-            font-family: ui-monospace, monospace;
-            font-size: 0.875rem;
-            color: black;
-            font-weight: 700;
-            outline: none;
-            transition: all 0.2s;
-        }
-        .lab-input:focus {
-            border-color: black;
-            background: white;
-            box-shadow: -4px 4px 0 var(--color-accent);
-        }
-        .lab-input::placeholder {
-            color: #9ca3af;
-            font-weight: 400;
-        }
-
-        /* Button Styling */
-        .accent-button {
-            background-color: black;
-            color: white;
-            font-weight: 800;
+        /* --- UTILITY & TYPOGRAPHY --- */
+        .tech-font {
+            font-family: 'Rajdhani', sans-serif;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            border: 2px solid black;
-            transition: all 0.2s;
-            position: relative;
-            overflow: hidden;
-            width: 100%;
-            padding: 14px;
-        }
-        .accent-button:hover {
-            background-color: var(--color-accent);
-            color: black;
-            border-color: black;
-            box-shadow: 4px 4px 0 black;
-            transform: translate(-2px, -2px);
-        }
-        .accent-button:disabled {
-            background-color: #d1d5db;
-            border-color: #d1d5db;
-            color: #6b7280;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
+            letter-spacing: 1px;
         }
 
-        /* Utils */
-        .bg-grid {
-            background-size: 40px 40px;
-            background-image: linear-gradient(to right, #e5e7eb 1px, transparent 1px),
-                              linear-gradient(to bottom, #e5e7eb 1px, transparent 1px);
+        /* --- LOGIN SCREEN --- */
+        #login-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--sidebar-bg);
+            z-index: 1000;
+            flex-direction: column;
+            transition: background-color 0.3s ease;
         }
+
+        .login-box {
+            width: 400px;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .uitm-logo {
+            width: 100px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
+        }
+
+        .login-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--ba-blue);
+            margin-bottom: 5px;
+        }
+
+        .login-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--ba-blue);
+            outline: none;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--ba-blue);
+            color: white;
+            box-shadow: 0 4px 10px rgba(18, 137, 244, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(18, 137, 244, 0.4);
+        }
+
+        /* --- MAIN DASHBOARD LAYOUT --- */
+        #app-container {
+            display: none;
+            height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar */
+        #sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+            transition: background-color 0.3s ease;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .brand img {
+            width: 40px;
+        }
+
+        .brand-text h1 {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+        .brand-text span {
+            font-size: 10px;
+            color: var(--ba-blue);
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nav-item {
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-weight: 700;
+            font-size: 14px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-item:hover {
+            color: var(--ba-blue);
+            background: var(--ba-light-blue);
+        }
+
+        .nav-item.active {
+            background: var(--ba-blue);
+            color: white;
+            box-shadow: 0 4px 12px rgba(18, 137, 244, 0.3);
+        }
+        
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 8px;
+            border-style: solid;
+            border-color: transparent transparent transparent var(--ba-blue);
+        }
+
+        /* Dark Mode Toggle */
+        .theme-toggle {
+            margin-top: auto;
+            padding: 15px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .toggle-switch {
+            width: 50px;
+            height: 26px;
+            background: var(--border-color);
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .toggle-switch::after {
+            content: '☀️';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        [data-theme="dark"] .toggle-switch {
+            background: var(--ba-blue);
+        }
+
+        [data-theme="dark"] .toggle-switch::after {
+            content: '🌙';
+            left: 26px;
+        }
+
+        /* Content Area */
+        #main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--content-bg);
+            position: relative;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Header */
+        header {
+            height: 70px;
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.3s ease;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-title::before {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 20px;
+            background: var(--ba-accent);
+            transform: skew(-20deg);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            background: var(--card-bg);
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #00C851;
+            border-radius: 50%;
+            box-shadow: 0 0 5px #00C851;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Content Scroll Area */
+        .content-scroll {
+            padding: 30px;
+            overflow-y: auto;
+            height: calc(100vh - 70px);
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 40px;
+        }
+
+        .empty-state i {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            max-width: 400px;
+        }
+
     </style>
 </head>
-<body class="flex items-center justify-center h-screen bg-grid animate-grid-pan relative">
+<body>
 
-    <!-- Decorative background elements -->
-    <div class="absolute top-10 left-10 data-mono text-xs font-bold text-gray-400">
-        SECURE_GATEWAY_V4.0 // PORT_8080
-    </div>
-    <div class="absolute bottom-10 right-10 data-mono text-xs font-bold text-gray-400 text-right">
-        RESTRICTED ACCESS<br>AUTHORIZED PERSONNEL ONLY
-    </div>
-
-    <!-- Login Card -->
-    <div class="system-frame w-full max-w-md p-10 animate-enter corner-marks z-10 relative overflow-hidden">
-        
-        <!-- Header -->
-        <div class="text-center mb-10 relative z-10">
-            <div class="inline-flex items-center justify-center w-24 h-24 bg-white text-black mb-4 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-2">
-                <img src="src/uitm.png" alt="UiTM Logo" class="w-full h-full object-contain">
-            </div>
-            <h1 class="text-3xl font-black tracking-tighter mb-1">STELLARIS<span class="text-yellow-500">.LAB</span></h1>
-            <p class="text-xs font-bold data-mono text-gray-400 uppercase tracking-[0.2em]">Identity Verification</p>
-        </div>
-
-        <!-- Form -->
-        <form id="loginForm" class="space-y-6 relative z-10" onsubmit="handleLogin(event)">
+    <div id="login-screen">
+        <div class="login-box">
+            <img src="src/uitm.png" alt="UiTM Logo" class="uitm-logo">
+            <h2 class="login-title tech-font">SCHALE // SOLAR</h2>
+            <p class="login-subtitle">IoT Smart Modular Greenhouse Management</p>
             
-            <!-- Error Message Container (Hidden by default) -->
-            <div id="errorDisplay" class="hidden bg-red-50 border-l-4 border-red-500 p-3 flex items-center">
-                <i data-lucide="alert-circle" class="w-4 h-4 text-red-500 mr-2"></i>
-                <span class="text-xs font-bold text-red-700 data-mono">INVALID CREDENTIALS</span>
-            </div>
-
-            <div>
-                <label class="block text-xs font-black uppercase mb-2 ml-1">Identity Hash</label>
-                <div class="relative">
-                    <i data-lucide="user" class="absolute left-3 top-3.5 w-4 h-4 text-gray-400"></i>
-                    <input type="text" id="username" class="lab-input pl-10" placeholder="USR-ID" required>
+            <form id="loginForm">
+                <div class="input-group">
+                    <label>ID CODE</label>
+                    <input type="text" placeholder="admin" value="admin">
                 </div>
-            </div>
-
-            <div>
-                <label class="block text-xs font-black uppercase mb-2 ml-1">Access Key</label>
-                <div class="relative">
-                    <i data-lucide="key" class="absolute left-3 top-3.5 w-4 h-4 text-gray-400"></i>
-                    <input type="password" id="password" class="lab-input pl-10" placeholder="••••••••" required>
+                <div class="input-group">
+                    <label>ACCESS KEY</label>
+                    <input type="password" placeholder="••••••" value="admin">
                 </div>
-            </div>
-
-            <div class="pt-2">
-                <button type="submit" id="submitBtn" class="accent-button">
-                    Initialize Session
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                    <i class="fas fa-fingerprint"></i> AUTHORIZE
                 </button>
-            </div>
-        </form>
-
-        <!-- Status Bar -->
-        <div class="mt-8 border-t border-gray-100 pt-4 flex justify-between items-center text-xs data-mono font-bold text-gray-400">
-            <span>ENCRYPTION: AES-256</span>
-            <span class="flex items-center text-green-600">
-                <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-                LINK_ACTIVE
-            </span>
+            </form>
         </div>
-
-        <!-- Scanning Overlay (Hidden initially) -->
-        <div id="scanOverlay" class="absolute inset-0 bg-white/90 z-20 hidden flex-col items-center justify-center">
-            <div class="w-64 h-1 bg-gray-200 overflow-hidden relative mb-4">
-                <div class="scan-bar"></div>
-            </div>
-            <p id="scanText" class="data-mono font-black text-sm animate-pulse">AUTHENTICATING...</p>
+        <div style="margin-top: 20px; font-size: 12px; color: var(--text-secondary);">
+            SECURE CONNECTION ESTABLISHED <br> SYSTEM VERSION 3.2.1
         </div>
+    </div>
 
+    <div id="app-container">
+        <nav id="sidebar">
+            <div class="brand">
+                <img src="src/uitm.png" alt="Logo">
+                <div class="brand-text">
+                    <h1>SOLAR.IoT</h1>
+                    <span class="tech-font">SCHALE DISTRICT</span>
+                </div>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item active" onclick="switchTab('dashboard', this)">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </li>
+                <li class="nav-item" onclick="switchTab('long-term', this)">
+                    <i class="fas fa-calendar-alt"></i> Long-Term Forecast
+                </li>
+                <li class="nav-item" onclick="switchTab('short-term', this)">
+                    <i class="fas fa-bolt"></i> Short-Term Forecast
+                </li>
+                <li class="nav-item" onclick="switchTab('model', this)">
+                    <i class="fas fa-cogs"></i> Re-trained Model
+                </li>
+            </ul>
+
+            <div class="theme-toggle">
+                <span class="theme-toggle-label tech-font">THEME</span>
+                <div class="toggle-switch" id="themeToggle"></div>
+            </div>
+        </nav>
+
+        <div id="main-content">
+            <header>
+                <div class="header-title tech-font" id="page-title">DASHBOARD OVERVIEW</div>
+                <div class="header-right">
+                    <div class="system-status">
+                        <div class="status-dot"></div>
+                        SYSTEM ONLINE
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: 800; font-size: 14px;">SENSEI</div>
+                        <div style="font-size: 10px; color: var(--text-secondary);">ADMINISTRATOR</div>
+                    </div>
+                    <div style="width: 35px; height: 35px; background: var(--ba-blue); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                        S
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-scroll">
+                
+                <div id="dashboard" class="section active">
+                    <div class="empty-state">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Dashboard</h3>
+                        <p>This section will display your solar forecasting dashboard with real-time data and predictions.</p>
+                    </div>
+                </div>
+
+                <div id="long-term" class="section">
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h3>Long-Term Forecast</h3>
+                        <p>View extended solar energy predictions and seasonal trends.</p>
+                    </div>
+                </div>
+
+                <div id="short-term" class="section">
+                    <div class="empty-state">
+                        <i class="fas fa-bolt"></i>
+                        <h3>Short-Term Forecast</h3>
+                        <p>Quick predictions for immediate solar output analysis.</p>
+                    </div>
+                </div>
+
+                <div id="model" class="section">
+                    <div class="empty-state">
+                        <i class="fas fa-cogs"></i>
+                        <h3>Re-trained Model</h3>
+                        <p>Upload datasets and configure your AI model pipeline here.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
 
     <script>
-        lucide.createIcons();
-
-        function handleLogin(e) {
+        // 1. LOGIN LOGIC
+        const loginForm = document.getElementById('loginForm');
+        loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
+            const btn = loginForm.querySelector('button');
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> VERIFYING...';
             
-            const btn = document.getElementById('submitBtn');
-            const overlay = document.getElementById('scanOverlay');
-            const scanText = document.getElementById('scanText');
-            const errorDisplay = document.getElementById('errorDisplay');
-            
-            // Get Input Values
-            const usernameInput = document.getElementById('username').value;
-            const passwordInput = document.getElementById('password').value;
-
-            // Reset UI
-            errorDisplay.classList.add('hidden');
-            
-            // Start Animation sequence
-            overlay.classList.remove('hidden');
-            overlay.classList.add('flex');
-            
-            // Step 1: Scanning UI
             setTimeout(() => {
-                scanText.textContent = "VERIFYING BIOMETRICS...";
-                scanText.classList.add('text-yellow-600');
-            }, 800);
+                document.getElementById('login-screen').style.opacity = '0';
+                document.getElementById('app-container').style.display = 'flex';
+                setTimeout(() => {
+                    document.getElementById('login-screen').style.display = 'none';
+                }, 500);
+            }, 1000);
+        });
 
-            // Step 2: Check Logic
-            setTimeout(() => {
-                
-                // --- LOGIN LOGIC ---
-                if (usernameInput === 'admin' && passwordInput === 'admin') {
-                    // SUCCESS
-                    scanText.textContent = "ACCESS GRANTED";
-                    scanText.classList.remove('text-yellow-600');
-                    scanText.classList.add('text-green-600', 'text-xl');
-                    
-                    setTimeout(() => {
-                        // Redirect to the dashboard
-                        // Note: Using the filename of the previous output as the dashboard
-                        window.location.href = 'dashboard.html'; 
-                    }, 1000);
-                    
-                } else {
-                    // FAILURE
-                    scanText.textContent = "ACCESS DENIED";
-                    scanText.classList.remove('text-yellow-600');
-                    scanText.classList.add('text-red-600', 'text-xl');
-                    
-                    setTimeout(() => {
-                        // Hide overlay and show error on form
-                        overlay.classList.add('hidden');
-                        overlay.classList.remove('flex');
-                        errorDisplay.classList.remove('hidden');
-                        
-                        // Reset text for next try
-                        setTimeout(() => {
-                            scanText.textContent = "AUTHENTICATING...";
-                            scanText.classList.remove('text-red-600', 'text-xl');
-                        }, 500);
-                    }, 1000);
-                }
+        // 2. TAB SWITCHING
+        function switchTab(tabId, navElement) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            navElement.classList.add('active');
 
-            }, 2000);
+            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+
+            const titles = {
+                'dashboard': 'DASHBOARD OVERVIEW',
+                'long-term': 'LONG-TERM FORECASTING',
+                'short-term': 'SHORT-TERM FORECASTING',
+                'model': 'RE-TRAINED MODEL CONFIG'
+            };
+            document.getElementById('page-title').innerText = titles[tabId];
         }
+
+        // 3. DARK MODE TOGGLE
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        htmlElement.setAttribute('data-theme', currentTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
     </script>
 </body>
 </html>
