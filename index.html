@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S.C.H.A.L.E | Solar Forecasting</title>
+    <title>S.C.H.A.L.E | Solar Monitoring</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 
@@ -24,7 +24,6 @@
             --border-color: #EEE;
         }
 
-        /* Dark Mode Colors */
         [data-theme="dark"] {
             --ba-bg: #1a1d29;
             --sidebar-bg: #22252e;
@@ -49,27 +48,16 @@
             height: 100vh;
             overflow: hidden;
             transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
         }
 
-        /* --- UTILITY & TYPOGRAPHY --- */
         .tech-font {
             font-family: 'Rajdhani', sans-serif;
             text-transform: uppercase;
             letter-spacing: 1px;
-        }
-
-        /* --- LOGIN SCREEN --- */
-        #login-screen {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: var(--sidebar-bg);
-            z-index: 1000;
-            flex-direction: column;
-            transition: background-color 0.3s ease;
         }
 
         .login-box {
@@ -96,6 +84,31 @@
             font-size: 14px;
             color: var(--text-secondary);
             margin-bottom: 30px;
+        }
+
+        .role-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .role-option {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 12px;
+        }
+
+        .role-option.selected {
+            border-color: var(--ba-blue);
+            background: var(--ba-light-blue);
+            color: var(--ba-blue);
         }
 
         .input-group {
@@ -143,8 +156,8 @@
             background: var(--ba-blue);
             color: white;
             box-shadow: 0 4px 10px rgba(18, 137, 244, 0.3);
-            position: relative;
-            overflow: hidden;
+            width: 100%;
+            justify-content: center;
         }
 
         .btn-primary:hover {
@@ -152,443 +165,74 @@
             box-shadow: 0 6px 15px rgba(18, 137, 244, 0.4);
         }
 
-        /* --- MAIN DASHBOARD LAYOUT --- */
-        #app-container {
-            display: none;
-            height: 100vh;
-            display: flex;
-        }
-
-        /* Sidebar */
-        #sidebar {
-            width: 260px;
-            background: var(--sidebar-bg);
-            display: flex;
-            flex-direction: column;
-            border-right: 1px solid var(--border-color);
-            padding: 20px;
-            position: relative;
-            z-index: 10;
-            transition: background-color 0.3s ease;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 40px;
-        }
-
-        .brand img {
-            width: 40px;
-        }
-
-        .brand-text h1 {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--text-primary);
-            line-height: 1;
-        }
-        .brand-text span {
-            font-size: 10px;
-            color: var(--ba-blue);
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-
-        .nav-menu {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .nav-item {
-            padding: 12px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            color: var(--text-secondary);
-            font-weight: 700;
-            font-size: 14px;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            position: relative;
-        }
-
-        .nav-item i {
-            width: 20px;
-            text-align: center;
-        }
-
-        .nav-item:hover {
-            color: var(--ba-blue);
-            background: var(--ba-light-blue);
-        }
-
-        .nav-item.active {
-            background: var(--ba-blue);
-            color: white;
-            box-shadow: 0 4px 12px rgba(18, 137, 244, 0.3);
-        }
-        
-        .nav-item.active::after {
-            content: '';
-            position: absolute;
-            right: -20px;
-            top: 50%;
-            transform: translateY(-50%);
-            border-width: 8px;
-            border-style: solid;
-            border-color: transparent transparent transparent var(--ba-blue);
-        }
-
-        /* Dark Mode Toggle */
-        .theme-toggle {
-            margin-top: auto;
-            padding: 15px;
-            background: var(--card-bg);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: all 0.3s ease;
-        }
-
-        .theme-toggle-label {
+        .system-info {
+            margin-top: 20px;
             font-size: 12px;
-            font-weight: 700;
             color: var(--text-secondary);
         }
-
-        .toggle-switch {
-            width: 50px;
-            height: 26px;
-            background: var(--border-color);
-            border-radius: 20px;
-            position: relative;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .toggle-switch::after {
-            content: '☀️';
-            position: absolute;
-            width: 22px;
-            height: 22px;
-            background: white;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        [data-theme="dark"] .toggle-switch {
-            background: var(--ba-blue);
-        }
-
-        [data-theme="dark"] .toggle-switch::after {
-            content: '🌙';
-            left: 26px;
-        }
-
-        /* Content Area */
-        #main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: var(--content-bg);
-            position: relative;
-            transition: background-color 0.3s ease;
-        }
-
-        /* Header */
-        header {
-            height: 70px;
-            background: var(--sidebar-bg);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 30px;
-            border-bottom: 1px solid var(--border-color);
-            transition: background-color 0.3s ease;
-        }
-
-        .header-title {
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .header-title::before {
-            content: '';
-            display: block;
-            width: 4px;
-            height: 20px;
-            background: var(--ba-accent);
-            transform: skew(-20deg);
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .system-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            background: var(--card-bg);
-            padding: 5px 15px;
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background: #00C851;
-            border-radius: 50%;
-            box-shadow: 0 0 5px #00C851;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* Content Scroll Area */
-        .content-scroll {
-            padding: 30px;
-            overflow-y: auto;
-            height: calc(100vh - 70px);
-        }
-
-        /* Sections */
-        .section {
-            display: none;
-            animation: fadeIn 0.4s ease;
-        }
-
-        .section.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Empty State */
-        .empty-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: var(--text-secondary);
-            text-align: center;
-            padding: 40px;
-        }
-
-        .empty-state i {
-            font-size: 80px;
-            margin-bottom: 20px;
-            opacity: 0.3;
-        }
-
-        .empty-state h3 {
-            font-size: 24px;
-            margin-bottom: 10px;
-            color: var(--text-primary);
-        }
-
-        .empty-state p {
-            font-size: 14px;
-            max-width: 400px;
-        }
-
     </style>
 </head>
 <body>
+    <div class="login-box">
+        <h2 class="login-title tech-font">SCHALE // SOLAR</h2>
+        <p class="login-subtitle">IoT Smart Solar Monitoring System</p>
+        
+        <div class="role-selector">
+            <div class="role-option selected tech-font" data-role="admin" onclick="selectRole('admin')">
+                <i class="fas fa-user-shield"></i> ADMIN
+            </div>
+            <div class="role-option tech-font" data-role="user" onclick="selectRole('user')">
+                <i class="fas fa-user"></i> USER
+            </div>
+        </div>
 
-    <div id="login-screen">
-        <div class="login-box">
-            <img src="src/uitm.png" alt="UiTM Logo" class="uitm-logo">
-            <h2 class="login-title tech-font">SCHALE // SOLAR</h2>
-            <p class="login-subtitle">IoT Smart Modular Greenhouse Management</p>
-            
-            <form id="loginForm">
-                <div class="input-group">
-                    <label>ID CODE</label>
-                    <input type="text" placeholder="admin" value="admin">
-                </div>
-                <div class="input-group">
-                    <label>ACCESS KEY</label>
-                    <input type="password" placeholder="••••••" value="admin">
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
-                    <i class="fas fa-fingerprint"></i> AUTHORIZE
-                </button>
-            </form>
-        </div>
-        <div style="margin-top: 20px; font-size: 12px; color: var(--text-secondary);">
-            SECURE CONNECTION ESTABLISHED <br> SYSTEM VERSION 3.2.1
-        </div>
+        <form id="loginForm">
+            <div class="input-group">
+                <label class="tech-font">ID CODE</label>
+                <input type="text" id="username" placeholder="Enter ID" required>
+            </div>
+            <div class="input-group">
+                <label class="tech-font">ACCESS KEY</label>
+                <input type="password" id="password" placeholder="••••••" required>
+            </div>
+            <button type="submit" class="btn btn-primary tech-font">
+                <i class="fas fa-fingerprint"></i> AUTHORIZE
+            </button>
+        </form>
     </div>
-
-    <div id="app-container">
-        <nav id="sidebar">
-            <div class="brand">
-                <img src="src/uitm.png" alt="Logo">
-                <div class="brand-text">
-                    <h1>SOLAR.IoT</h1>
-                    <span class="tech-font">SCHALE DISTRICT</span>
-                </div>
-            </div>
-
-            <ul class="nav-menu">
-                <li class="nav-item active" onclick="switchTab('dashboard', this)">
-                    <i class="fas fa-chart-line"></i> Dashboard
-                </li>
-                <li class="nav-item" onclick="switchTab('long-term', this)">
-                    <i class="fas fa-calendar-alt"></i> Long-Term Forecast
-                </li>
-                <li class="nav-item" onclick="switchTab('short-term', this)">
-                    <i class="fas fa-bolt"></i> Short-Term Forecast
-                </li>
-                <li class="nav-item" onclick="switchTab('model', this)">
-                    <i class="fas fa-cogs"></i> Re-trained Model
-                </li>
-            </ul>
-
-            <div class="theme-toggle">
-                <span class="theme-toggle-label tech-font">THEME</span>
-                <div class="toggle-switch" id="themeToggle"></div>
-            </div>
-        </nav>
-
-        <div id="main-content">
-            <header>
-                <div class="header-title tech-font" id="page-title">DASHBOARD OVERVIEW</div>
-                <div class="header-right">
-                    <div class="system-status">
-                        <div class="status-dot"></div>
-                        SYSTEM ONLINE
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="font-weight: 800; font-size: 14px;">SENSEI</div>
-                        <div style="font-size: 10px; color: var(--text-secondary);">ADMINISTRATOR</div>
-                    </div>
-                    <div style="width: 35px; height: 35px; background: var(--ba-blue); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
-                        S
-                    </div>
-                </div>
-            </header>
-
-            <div class="content-scroll">
-                
-                <div id="dashboard" class="section active">
-                    <div class="empty-state">
-                        <i class="fas fa-chart-line"></i>
-                        <h3>Dashboard</h3>
-                        <p>This section will display your solar forecasting dashboard with real-time data and predictions.</p>
-                    </div>
-                </div>
-
-                <div id="long-term" class="section">
-                    <div class="empty-state">
-                        <i class="fas fa-calendar-alt"></i>
-                        <h3>Long-Term Forecast</h3>
-                        <p>View extended solar energy predictions and seasonal trends.</p>
-                    </div>
-                </div>
-
-                <div id="short-term" class="section">
-                    <div class="empty-state">
-                        <i class="fas fa-bolt"></i>
-                        <h3>Short-Term Forecast</h3>
-                        <p>Quick predictions for immediate solar output analysis.</p>
-                    </div>
-                </div>
-
-                <div id="model" class="section">
-                    <div class="empty-state">
-                        <i class="fas fa-cogs"></i>
-                        <h3>Re-trained Model</h3>
-                        <p>Upload datasets and configure your AI model pipeline here.</p>
-                    </div>
-                </div>
-
-            </div>
-        </div>
+    <div class="system-info tech-font">
+        SECURE CONNECTION ESTABLISHED <br> SYSTEM VERSION 3.2.1
     </div>
 
     <script>
-        // 1. LOGIN LOGIC
-        const loginForm = document.getElementById('loginForm');
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const btn = loginForm.querySelector('button');
-            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> VERIFYING...';
-            
-            setTimeout(() => {
-                document.getElementById('login-screen').style.opacity = '0';
-                document.getElementById('app-container').style.display = 'flex';
-                setTimeout(() => {
-                    document.getElementById('login-screen').style.display = 'none';
-                }, 500);
-            }, 1000);
-        });
+        let selectedRole = 'admin';
 
-        // 2. TAB SWITCHING
-        function switchTab(tabId, navElement) {
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            navElement.classList.add('active');
-
-            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-
-            const titles = {
-                'dashboard': 'DASHBOARD OVERVIEW',
-                'long-term': 'LONG-TERM FORECASTING',
-                'short-term': 'SHORT-TERM FORECASTING',
-                'model': 'RE-TRAINED MODEL CONFIG'
-            };
-            document.getElementById('page-title').innerText = titles[tabId];
+        function selectRole(role) {
+            selectedRole = role;
+            document.querySelectorAll('.role-option').forEach(el => el.classList.remove('selected'));
+            document.querySelector(`[data-role="${role}"]`).classList.add('selected');
         }
 
-        // 3. DARK MODE TOGGLE
-        const themeToggle = document.getElementById('themeToggle');
-        const htmlElement = document.documentElement;
-
-        // Check for saved theme preference or default to light mode
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        htmlElement.setAttribute('data-theme', currentTheme);
-
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = htmlElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
             
-            htmlElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-        });
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const btn = e.target.querySelector('button');
 
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> VERIFYING...';
+
+            setTimeout(() => {
+                if (selectedRole === 'admin' && username === 'admin' && password === 'admin') {
+                    window.location.href = 'admin-dashboard.html';
+                } else if (selectedRole === 'user' && username === 'user' && password === 'user') {
+                    window.location.href = 'user-dashboard.html';
+                } else {
+                    alert('Invalid credentials');
+                    btn.innerHTML = '<i class="fas fa-fingerprint"></i> AUTHORIZE';
+                }
+            }, 1000);
+        });
     </script>
 </body>
 </html>
